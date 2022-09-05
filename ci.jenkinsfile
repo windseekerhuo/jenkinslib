@@ -1,20 +1,21 @@
 #!groovy
+
 @Library('jenkinslib') _
 
-def tools= new org.devops.tools()
+def tools = new org.devops.tools()
 
 
 String workspace=/data/jenkins/workspace
 
 pipeline{
-    agent { node { lable 'master'
+    agent { node { label 'master'
                   customWorkspace "${workspace}"
             }  
     }
     options {
         timestamps()
         skipDefaultCheckout()
-        disableConcurrentBuild()
+        disableConcurrentBuilds()
         timeout(time:1,unit:'HOURS')
     }
     stages {
@@ -26,7 +27,7 @@ pipeline{
 							println('获取代码');
 							println("${test}");
 							
-							input id:'Test',message:'我们是否继续？',ok:'是,继续吧',parameters: [choice(choices: "choice1\nchoice2\n",description: 'Choose an option', name: 'Options')]
+							//input id:'Test',message:'我们是否继续？',ok:'是,继续吧',parameters: [choice(choices: "choice1\nchoice2\n",description: 'Choose an option', name: 'Options')]
 		
 						}
                 }
@@ -38,12 +39,16 @@ pipeline{
 				//构建
 				stage("Build"){
 					steps{
-						println('应用打包')
+					    timeout(time:30,unit:"MINUTES"){
+						    script{
+						        println('应用打包')
 						
-						mvnHome  = tool "M2"
-						println(mvnHome)
+						        mvnHome  = tool "M2"
+						        println(mvnHome)
 						
-						sh "${mvnHome}/bin/mvn --version"	
+						        sh "${mvnHome}/bin/mvn --version"
+						    }
+					    }
 					}
 				}
 				
